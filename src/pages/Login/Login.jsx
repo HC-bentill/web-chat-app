@@ -1,13 +1,17 @@
 import React, { useRef } from 'react'
+import { useDispatch } from 'react-redux';
+import { setLogin } from '../../redux/user/userSlice';
 import { storeItem } from '../../services/jwt.service';
 import "./login.css"
 
 function Login() {
 
   const usernameRef = useRef();
+  const dispatch = useDispatch();
 
   const handleLoginSubmit = (event) => {
     event.preventDefault();
+    
     let time = new Date().toLocaleDateString(undefined, {
       day: '2-digit',
       month: '2-digit',
@@ -18,17 +22,17 @@ function Login() {
   })
 
     const userData = {
-      username: usernameRef?.current.value,
+      username: usernameRef?.current?.value,
       loginTime:time
     }
 
-    storeItem(JSON.stringify(userData), "User Data")
+    const strUserData = JSON.stringify(userData);
+
+    storeItem(strUserData, "User Data")
+    dispatch(setLogin(true))
 
   }
   
-  
-
-  console.log("username", usernameRef?.current?.value)
 
   return (
 <section className="vh-100">
@@ -46,7 +50,6 @@ function Login() {
           <div className="form-outline mb-4">
             <input ref={usernameRef} type="text" id="form3Example3" className="form-control form-control-lg"
               placeholder="Enter Name" />
-            <label className="form-label" htmlFor="form3Example3">Enter Name</label>
           </div>
 
           <div className="text-center text-lg-start mt-4 pt-2">
