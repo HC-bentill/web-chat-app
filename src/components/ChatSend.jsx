@@ -8,7 +8,7 @@ function ChatSend({ msg }) {
           className="p-3 me-3 border"
           style={{ borderRadius: "15px", backgroundColor: "#fbfbfb" }}
         >
-          <p className="small mb-0">Thank you, I really like your product.</p>
+          <p className="small mb-0">{msg}</p>
         </div>
         <img
           src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"

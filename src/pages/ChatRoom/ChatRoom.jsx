@@ -20,7 +20,7 @@ import { getItem } from "../../services/jwt.service";
 
 export default function ChatRoom() {
   const dispatch = useDispatch();
-  const messages = useSelector(selectMessages)
+  const messages = useSelector(selectMessages);
   const getUserId = JSON.parse(getItem("User Data"));
   const handleLogout = () => {
     dispatch(setLogout());
@@ -35,10 +35,16 @@ export default function ChatRoom() {
       userId: getUserId?.userId,
       userMsg: msgRef?.current?.value,
     };
-    
-    //reset input field after message is sent
-    if (dispatch(addMessage(userMsg))){
+
+    //actions after msg is sent
+    if (dispatch(addMessage(userMsg))) {
       document.getElementById("msgForm").reset();
+      var element = document.getElementById('chat-body');
+      function scrollToBottom(element) {
+        element.scroll({ top: element.scrollHeight, behavior: 'smooth' });
+      }
+
+      scrollToBottom(element)
     }
   };
 
@@ -70,22 +76,21 @@ export default function ChatRoom() {
                 >
                   Logout
                 </MDBBtn>
-                <p className="mb-0 fw-bold">Live chat : {truncateText(getUserId?.username, 10)} </p>
+                <p className="mb-0 fw-bold">
+                  Live chat : {truncateText(getUserId?.username, 10)}{" "}
+                </p>
               </MDBCardHeader>
 
               <MDBCardBody>
-                <div className="chatBody">
-
-                  {}
-
-                  <ChatReceive
-                    msg={
-                      "Hello and thank you for visiting MDBootstrap. Please click the video below."
+                <div className="chatBody" id="chat-body">
+                  {messages.map((msg, idx) => {
+                    if (msg.userId === getUserId?.userId) {
+                     return <ChatSend msg={msg.userMsg} />;
+                    } else {
+                     return <ChatReceive msg={msg.userMsg} />;
                     }
-                  />
+                  })}
 
-
-                  <ChatSend msg={"Thank you, I really like your product."} />
                 </div>
 
                 <form id="msgForm" onSubmit={handleMsgSend}>
@@ -100,7 +105,7 @@ export default function ChatRoom() {
                     />
                   </div>
 
-                  <MDBBtn type="submit" className="w-100 mt-2" color="primary">
+                  <MDBBtn type="submit" className="w-100 mt-1" color="primary">
                     Send
                   </MDBBtn>
                 </form>
