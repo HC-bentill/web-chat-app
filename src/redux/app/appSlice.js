@@ -4,16 +4,22 @@ export const appSlice = createSlice({
   name: "app",
   initialState: {
     appState: null,
+    messages:[]
   },
   reducers: {
     setappState: (state, action) => {
       state.appState = action.payload; 
     },
-  },
+    addMessage: (state, action) => {
+      state.messages = [...state.messages, action.payload];
+    },  },
 });
 
-export const { setappState } = appSlice.actions;
+export const { setappState, addMessage } = appSlice.actions;
 
-export const selectappState= (state) => state.app.appState; //so from state(onion) to the appslice to registrationForm
+export const selectappState= (state) => state.app.appState; 
+
+export const selectMessages= (state) => state.app.messages;
+
 
 export default appSlice.reducer;

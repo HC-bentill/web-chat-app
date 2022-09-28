@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import { useDispatch } from 'react-redux';
 import { setLogin } from '../../redux/user/userSlice';
 import { storeItem } from '../../services/jwt.service';
+import { uuid } from '../../utils';
 import "./login.css"
 
 function Login() {
@@ -22,6 +23,7 @@ function Login() {
   })
 
     const userData = {
+      userId: uuid(),
       username: usernameRef?.current?.value,
       loginTime:time
     }

@@ -10,7 +10,7 @@ export const userSlice = createSlice({
       state.user = action.payload;
     },
     setLogout: (state) => {
-      state.user = null;
+      state.user = false;
     },
   },
 });

@@ -1,5 +1,5 @@
-import React from "react";
-import './chatroom.css'
+import React, { useRef } from "react";
+import "./chatroom.css";
 import {
   MDBContainer,
   MDBRow,
@@ -9,113 +9,106 @@ import {
   MDBCardBody,
   MDBIcon,
   MDBTextArea,
+  MDBBtn,
 } from "mdb-react-ui-kit";
+import ChatReceive from "../../components/ChatReceive";
+import ChatSend from "../../components/ChatSend";
+import { useDispatch, useSelector } from "react-redux";
+import { setLogout } from "../../redux/user/userSlice";
+import { addMessage, selectMessages } from "../../redux/app/appSlice";
+import { getItem } from "../../services/jwt.service";
 
 export default function ChatRoom() {
+  const dispatch = useDispatch();
+  const messages = useSelector(selectMessages)
+  const getUserId = JSON.parse(getItem("User Data"));
+  const handleLogout = () => {
+    dispatch(setLogout());
+  };
+
+  const msgRef = useRef();
+
+  const handleMsgSend = (event) => {
+    event.preventDefault();
+
+    const userMsg = {
+      userId: getUserId?.userId,
+      userMsg: msgRef?.current?.value,
+    };
+    
+    //reset input field after message is sent
+    if (dispatch(addMessage(userMsg))){
+      document.getElementById("msgForm").reset();
+    }
+  };
+
+  const truncateText = (strn, len) => {
+    const string = strn.slice(0, len).concat("...");
+    return string;
+  };
+
   return (
     <>
-    <MDBContainer className="py-5">
-      <MDBRow className="d-flex justify-content-center">
-        <MDBCol md="8" lg="6" xl="4">
-          <MDBCard id="chat1" style={{ borderRadius: "15px" }}>
-            <MDBCardHeader
-              className="d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
-              style={{
-                borderTopLeftRadius: "15px",
-                borderTopRightRadius: "15px",
-              }}
-            >
-              <MDBIcon fas icon="angle-left" />
-              <p className="mb-0 fw-bold">Live chat</p>
-              <MDBIcon fas icon="times" />
-            </MDBCardHeader>
-
-            <MDBCardBody>
-              <div className="d-flex flex-row justify-content-start mb-4">
-                <img
-                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1"
-                  style={{ width: "45px", height: "100%" }}
-                />
-                <div
-                  className="p-3 ms-3"
-                  style={{
-                    borderRadius: "15px",
-                    backgroundColor: "rgba(57, 192, 237,.2)",
+      <MDBContainer className="py-3">
+        <MDBRow className="d-flex justify-content-center">
+          <MDBCol md="8" lg="6" xl="4">
+            <MDBCard id="chat1" style={{ borderRadius: "15px" }}>
+              <MDBCardHeader
+                className="d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
+                style={{
+                  borderTopLeftRadius: "15px",
+                  borderTopRightRadius: "15px",
+                }}
+              >
+                <MDBBtn
+                  onClick={() => {
+                    handleLogout();
                   }}
+                  type="buttton"
+                  className="mx-2"
+                  color="danger"
                 >
-                  <p className="small mb-0">
-                    Hello and thank you for visiting MDBootstrap. Please click
-                    the video below.
-                  </p>
-                </div>
-              </div>
+                  Logout
+                </MDBBtn>
+                <p className="mb-0 fw-bold">Live chat : {truncateText(getUserId?.username, 10)} </p>
+              </MDBCardHeader>
 
-              <div className="d-flex flex-row justify-content-end mb-4">
-                <div
-                  className="p-3 me-3 border"
-                  style={{ borderRadius: "15px", backgroundColor: "#fbfbfb" }}
-                >
-                  <p className="small mb-0">
-                    Thank you, I really like your product.
-                  </p>
-                </div>
-                <img
-                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
-                  alt="avatar 1"
-                  style={{ width: "45px", height: "100%" }}
-                />
-              </div>
+              <MDBCardBody>
+                <div className="chatBody">
 
-              <div className="d-flex flex-row justify-content-start mb-4">
-                <img
-                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1"
-                  style={{ width: "45px", height: "100%" }}
-                />
-                <div className="ms-3" style={{ borderRadius: "15px" }}>
-                  <div className="bg-image">
-                    <img
-                      src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/screenshot1.webp"
-                      style={{ borderRadius: "15px" }}
-                      alt="video"
+                  {}
+
+                  <ChatReceive
+                    msg={
+                      "Hello and thank you for visiting MDBootstrap. Please click the video below."
+                    }
+                  />
+
+
+                  <ChatSend msg={"Thank you, I really like your product."} />
+                </div>
+
+                <form id="msgForm" onSubmit={handleMsgSend}>
+                  <div className=" mb-4">
+                    <input
+                      ref={msgRef}
+                      type="text"
+                      id="form3Example3"
+                      className="form-control form-control-lg form-outline"
+                      placeholder="Enter Message"
+                      required
                     />
-                    <a href="#!">
-                      <div className="mask"></div>
-                    </a>
                   </div>
-                </div>
-              </div>
 
-              <div className="d-flex flex-row justify-content-start mb-4">
-                <img
-                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                  alt="avatar 1"
-                  style={{ width: "45px", height: "100%" }}
-                />
-                <div
-                  className="p-3 ms-3"
-                  style={{
-                    borderRadius: "15px",
-                    backgroundColor: "rgba(57, 192, 237,.2)",
-                  }}
-                >
-                  <p className="small mb-0">...</p>
-                </div>
-              </div>
-
-              <MDBTextArea
-                className="form-outline"
-                label="Type your message"
-                id="textAreaExample"
-                rows={4}
-              />
-            </MDBCardBody>
-          </MDBCard>
-        </MDBCol>
-      </MDBRow>
-    </MDBContainer>
+                  <MDBBtn type="submit" className="w-100 mt-2" color="primary">
+                    Send
+                  </MDBBtn>
+                </form>
+              </MDBCardBody>
+            </MDBCard>
+          </MDBCol>
+        </MDBRow>
+      </MDBContainer>
     </>
-
   );
 }
