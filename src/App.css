@@ -1,0 +1,7 @@
+.App{
+    background: url('./assets/blue-pink-halftone-background_53876-99004\ \(1\).jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+input{background-color: white !important;}
