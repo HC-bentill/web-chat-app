@@ -2,6 +2,8 @@
     background: url('./assets/blue-pink-halftone-background_53876-99004\ \(1\).jpg');
     background-repeat: no-repeat;
     background-size: cover;
+    min-height: 100vh;
+    /* overflow:scroll; */
 }
 
 input{background-color: white !important;}
