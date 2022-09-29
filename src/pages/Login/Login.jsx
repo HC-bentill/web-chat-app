@@ -32,7 +32,7 @@ function Login() {
 
     storeItem(strUserData, "User Data")
     dispatch(setLogin(true))
-
+    window.location.reload()
   }
   
 

@@ -1,6 +1,23 @@
 import React from "react";
 
-function ChatSend({ msg }) {
+function ChatSend({ msg, username }) {
+  const getFirstLetter = (params) => {
+    let str = params;
+    return str?.toUpperCase().charAt(0);
+  };
+
+
+  const avatarBG = {
+    backgroundColor: "#39c0ed",
+    borderRadius: "100%",
+    height: "40px",
+    display: "grid",
+    width: "40px",
+    placeItems: "center",
+    fontWeight: "bold",
+    color:"black"
+  };
+
   return (
     <>
       <div className="d-flex flex-row justify-content-end mb-4">
@@ -10,14 +27,12 @@ function ChatSend({ msg }) {
         >
           <p className="small mb-0">{msg}</p>
         </div>
-        <img
-          src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp"
-          alt="avatar 1"
-          style={{ width: "45px", height: "100%" }}
-        />
+        <div className="userAvatar" style={avatarBG}>
+          {getFirstLetter(username)}
+        </div>
       </div>
     </>
   );
 }
 
-export default ChatSend;
+export default React.memo(ChatSend);

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./chatroom.css";
 import {
   MDBContainer,
@@ -13,14 +13,16 @@ import {
 } from "mdb-react-ui-kit";
 import ChatReceive from "../../components/ChatReceive";
 import ChatSend from "../../components/ChatSend";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setLogout } from "../../redux/user/userSlice";
-import { addMessage, selectMessages } from "../../redux/app/appSlice";
+import { addMessage } from "../../redux/app/appSlice";
 import { getItem } from "../../services/jwt.service";
+import swal from "sweetalert";
 
-export default function ChatRoom() {
+function ChatRoom({ messages }) {
   const dispatch = useDispatch();
-  const messages = useSelector(selectMessages);
+
+  const [newMessageList, setNewMessageList] = useState([]);
   const getUserId = JSON.parse(getItem("User Data"));
   const handleLogout = () => {
     dispatch(setLogout());
@@ -28,30 +30,50 @@ export default function ChatRoom() {
 
   const msgRef = useRef();
 
+  const resetMessages = () => {
+    setNewMessageList([...messages])
+  }
+
+  useEffect(()=>{
+    resetMessages();
+  },[messages])
+
+  useEffect(()=>{
+    window.addEventListener('storage', ()=>{
+      resetMessages();
+      console.log("messages=",messages)
+    })
+  },[])
+
   const handleMsgSend = (event) => {
     event.preventDefault();
-
     const userMsg = {
       userId: getUserId?.userId,
       userMsg: msgRef?.current?.value,
+      userName: getUserId?.username,
     };
-
+    let action = dispatch(addMessage(userMsg));
     //actions after msg is sent
-    if (dispatch(addMessage(userMsg))) {
-      document.getElementById("msgForm").reset();
-      var element = document.getElementById('chat-body');
+    if (action) {
+      //dispatch event that new item has been added to storage
+      window.dispatchEvent(new Event("storage"));
+      //scroll to latest text
+      var element = document.getElementById("chat-body");
       function scrollToBottom(element) {
-        element.scroll({ top: element.scrollHeight, behavior: 'smooth' });
+        element.scroll({ top: element.scrollHeight, behavior: "smooth" });
       }
-
-      scrollToBottom(element)
+      scrollToBottom(element);
+      //clean up send message input field
+      document.getElementById("msgForm").reset();
     }
   };
 
   const truncateText = (strn, len) => {
-    const string = strn.slice(0, len).concat("...");
+    const string = strn?.slice(0, len).concat("...");
     return string;
   };
+
+
 
   return (
     <>
@@ -67,6 +89,7 @@ export default function ChatRoom() {
                 }}
               >
                 <MDBBtn
+                  rounded
                   onClick={() => {
                     handleLogout();
                   }}
@@ -83,14 +106,20 @@ export default function ChatRoom() {
 
               <MDBCardBody>
                 <div className="chatBody" id="chat-body">
-                  {messages.map((msg, idx) => {
+                  {newMessageList.map((msg, idx) => {
                     if (msg.userId === getUserId?.userId) {
-                     return <ChatSend msg={msg.userMsg} />;
+                      return (
+                        <ChatSend msg={msg.userMsg} username={msg?.userName} />
+                      );
                     } else {
-                     return <ChatReceive msg={msg.userMsg} />;
+                      return (
+                        <ChatReceive
+                          msg={msg.userMsg}
+                          username={msg?.userName}
+                        />
+                      );
                     }
                   })}
-
                 </div>
 
                 <form id="msgForm" onSubmit={handleMsgSend}>
@@ -117,3 +146,5 @@ export default function ChatRoom() {
     </>
   );
 }
+
+export default React.memo(ChatRoom);

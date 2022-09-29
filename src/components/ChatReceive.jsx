@@ -1,14 +1,31 @@
 import React from "react";
 
-function ChatReceive({msg}) {
+function ChatReceive({msg, username}) {
+  const getFirstLetter = (params) => {
+    let str = params;
+    return str?.toUpperCase().charAt(0);
+  };
+
+  var randomColor = "#" + Math.floor(Math.random() * 19777215).toString(16);
+  
+
+  const avatarBG = {
+    backgroundColor: randomColor,
+    borderRadius: "100%",
+    height: "40px",
+    display: "grid",
+    width: "40px",
+    placeItems: "center",
+    fontWeight: "bold",
+    color:"black"
+  };
+  
   return (
     <>
       <div className="d-flex flex-row justify-content-start mb-4">
-        <img
-          src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-          alt="avatar 1"
-          style={{ width: "45px", height: "100%" }}
-        />
+      <div className="userAvatar" style={avatarBG}>
+          {getFirstLetter(username)}
+        </div>
         <div
           className="p-3 ms-3"
           style={{
@@ -25,4 +42,4 @@ function ChatReceive({msg}) {
   );
 }
 
-export default ChatReceive;
+export default React.memo(ChatReceive);
