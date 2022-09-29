@@ -15,9 +15,8 @@ import ChatReceive from "../../components/ChatReceive";
 import ChatSend from "../../components/ChatSend";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../redux/user/userSlice";
-import { addMessage } from "../../redux/app/appSlice";
 import { getItem } from "../../services/jwt.service";
-import swal from "sweetalert";
+import { addMessage } from "../../services/chatRoomDB.service";
 
 function ChatRoom({ messages }) {
   const dispatch = useDispatch();
@@ -31,28 +30,31 @@ function ChatRoom({ messages }) {
   const msgRef = useRef();
 
   const resetMessages = () => {
-    setNewMessageList([...messages])
-  }
+    setNewMessageList([...messages]);
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     resetMessages();
-  },[messages])
+  }, [messages]);
 
-  useEffect(()=>{
-    window.addEventListener('storage', ()=>{
+  useEffect(() => {
+    window.addEventListener("storage", () => {
       resetMessages();
-      console.log("messages=",messages)
-    })
-  },[])
+      console.log("messages=", messages);
+    });
+  }, []);
 
   const handleMsgSend = (event) => {
     event.preventDefault();
+    //clean up send message input field
+    document.getElementById("msgForm").reset();
+
     const userMsg = {
       userId: getUserId?.userId,
       userMsg: msgRef?.current?.value,
       userName: getUserId?.username,
     };
-    let action = dispatch(addMessage(userMsg));
+    let action = addMessage(userMsg);
     //actions after msg is sent
     if (action) {
       //dispatch event that new item has been added to storage
@@ -63,8 +65,6 @@ function ChatRoom({ messages }) {
         element.scroll({ top: element.scrollHeight, behavior: "smooth" });
       }
       scrollToBottom(element);
-      //clean up send message input field
-      document.getElementById("msgForm").reset();
     }
   };
 
@@ -72,8 +72,6 @@ function ChatRoom({ messages }) {
     const string = strn?.slice(0, len).concat("...");
     return string;
   };
-
-
 
   return (
     <>

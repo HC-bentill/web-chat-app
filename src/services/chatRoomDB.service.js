@@ -1,6 +1,5 @@
-
-
 const msgsData = [];
+var db;
 
 export const initialzeDb = () => {
   var request = window.indexedDB.open("chatroomMessages", 1);
@@ -8,22 +7,24 @@ export const initialzeDb = () => {
     var db = event.target.result;
     if (!db.objectStoreNames.contains("messages")) {
       // if there's no "message" store
-      var objectStore = db.createObjectStore("messages", { keyPath: "userId" });
+      var objectStore = db.createObjectStore("messages", {
+        autoIncrement: true,
+      });
       // create it
     }
   };
-  return request, db;
+  return request;
 };
 
-const {request, db} = initialzeDb();
+const request = initialzeDb();
 
 request.onerror = function (event) {
-  console.log("error: ", request.error);
+  console.log("error initiating IDB: ", request.error);
 };
 
 request.onsuccess = function (event) {
   db = request.result;
-  console.log("success: " + db);
+  console.log("success: IDB initiated");
 };
 
 //   for (var i in msgsData) {
@@ -37,7 +38,7 @@ export function read() {
   var request = objectStore.get("1fee3a92-84f9-4b08-3ff5-5e4fb1330ca0");
 
   request.onerror = function (event) {
-    alert("Unable to retrieve daa from database!");
+    alert("Unable to retrieve data from database!");
   };
 
   request.onsuccess = function (event) {
@@ -50,25 +51,32 @@ export function read() {
   };
 }
 
-export function readAll() {
-  var objectStore = db.transaction("messages").objectStore("messages");
+export function readAllMessages() {
+  function query(db, myCallbackFunction) {
+    const tx = db.transaction("messages");
+    const store = tx.objectStore("messages");
+    const request = store.getAll();
 
-  objectStore.openCursor().onsuccess = function (event) {
-    var cursor = event.target.result;
+    request.onsuccess = (event) => {
+      const data = event.target.result;
+      myCallbackFunction(data);
+    };
+  }
 
-    if (cursor) {
-      console.log(cursor);
-      cursor.continue();
-    } else {
-      console.log("no entries");
-    }
+  // Open the database and then run the query
+  var openRequest = indexedDB.open("chatroomMessages");
+  openRequest.onsuccess = (event) => {
+    query(db, (data = []) => {
+      // This gets called when the query has run with the loaded
+      console.log("all messages", data);
+    });
   };
 }
 
 export function addMessage(payload) {
   var request = db
-    .transaction(["message"], "readwrite")
-    .objectStore("message")
+    .transaction(["messages"], "readwrite")
+    .objectStore("messages")
     .add(payload);
 
   request.onsuccess = function (event) {
@@ -77,6 +85,7 @@ export function addMessage(payload) {
 
   request.onerror = function (event) {
     alert("Unable to add message");
+    console.log("unable to add msg", request.error);
   };
 }
 
