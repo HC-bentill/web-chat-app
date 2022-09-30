@@ -10,14 +10,14 @@ function ChatReceive({msg, username}) {
   
 
   const avatarBG = {
-    backgroundColor: randomColor,
+    backgroundColor: "gray",
     borderRadius: "100%",
     height: "40px",
     display: "grid",
     width: "40px",
     placeItems: "center",
     fontWeight: "bold",
-    color:"black"
+    color:"white"
   };
   
   return (

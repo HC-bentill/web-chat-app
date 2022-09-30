@@ -51,6 +51,36 @@ export function read() {
   };
 }
 
+// export function readAllMessages() {
+//   let results = {data:[]};
+//   function outputResults(data){
+//     // console.log("all message", data)
+//     results.data = [...results.data, data];
+//   }
+
+//   function query(db, myCallbackFunction) {
+//     const tx = db.transaction("messages");
+//     const store = tx.objectStore("messages");
+//     const request = store.getAll();
+
+//     request.onsuccess = (event) => {
+//       const data = event.target.result;
+//       myCallbackFunction(data);
+//     };
+//   }
+
+//   // Open the database and then run the query
+//   var openRequest = indexedDB.open("chatroomMessages");
+//   openRequest.onsuccess = (event) => {
+//     query(db, (data = []) => {
+//       // This gets called when the query has run with the loaded
+//        outputResults(data);
+//     });
+//   };
+
+//   return results
+// }
+
 export function readAllMessages() {
   function query(db, myCallbackFunction) {
     const tx = db.transaction("messages");
@@ -68,7 +98,7 @@ export function readAllMessages() {
   openRequest.onsuccess = (event) => {
     query(db, (data = []) => {
       // This gets called when the query has run with the loaded
-      console.log("all messages", data);
+      localStorage.setItem("results", JSON.stringify(data));
     });
   };
 }
@@ -80,7 +110,8 @@ export function addMessage(payload) {
     .add(payload);
 
   request.onsuccess = function (event) {
-    alert("message added");
+    console.log("message added");
+    window.dispatchEvent(new Event("storage"));
   };
 
   request.onerror = function (event) {
