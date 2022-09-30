@@ -16,18 +16,41 @@ import ChatSend from "../../components/ChatSend";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../redux/user/userSlice";
 import { getItem } from "../../services/jwt.service";
-import { addMessage } from "../../services/chatRoomDB.service";
+import { addMessage } from "../../redux/app/appSlice";
+
+const testDat = [
+  //change ids to test for senders and receivers chat bubble
+  {
+    userId: "11049f5e-60d1-4b14-e5d5-619e9f7848d9",
+    userMsg: "asd",
+    userName: "abei",
+  },
+  {
+    userId: "3388f2e6-7a31-4e2sd-7e80-09e8aedac1d9",
+    userMsg: "asd",
+    userName: "abei",
+  },
+  {
+    userId: "3388f2e6-7a31-4ed2d-7e80-09e8aedac1d9",
+    userMsg: "asd",
+    userName: "abei",
+  },
+];
 
 function ChatRoom({ messages }) {
-  const dispatch = useDispatch();
+  const msgRef = useRef();
 
+  setTimeout(function () {
+    window.location.reload(1);
+  }, 5000);
+
+  const dispatch = useDispatch();
+  var element = document.getElementById("chat-body");
   const [newMessageList, setNewMessageList] = useState([]);
   const getUserId = JSON.parse(getItem("User Data"));
   const handleLogout = () => {
     dispatch(setLogout());
   };
-
-  const msgRef = useRef();
 
   const resetMessages = () => {
     setNewMessageList([...messages]);
@@ -35,36 +58,26 @@ function ChatRoom({ messages }) {
 
   useEffect(() => {
     resetMessages();
+    console.log("new message added =", messages);
+    var element = document.getElementById("chat-body");
+    element.scrollTo(0, 9000);
   }, [messages]);
 
-  useEffect(() => {
-    window.addEventListener("storage", () => {
-      resetMessages();
-      console.log("messages=", messages);
-    });
-  }, []);
-
   const handleMsgSend = (event) => {
+    window.dispatchEvent(new Event("storage"));
     event.preventDefault();
-    //clean up send message input field
-    document.getElementById("msgForm").reset();
-
+    function scrollToBottom(element) {
+      element.scroll({ top: element.scrollHeight, behavior: "smooth" });
+    }
+    scrollToBottom(element);
     const userMsg = {
       userId: getUserId?.userId,
       userMsg: msgRef?.current?.value,
       userName: getUserId?.username,
     };
-    let action = addMessage(userMsg);
-    //actions after msg is sent
+    let action = dispatch(addMessage(userMsg));
     if (action) {
-      //dispatch event that new item has been added to storage
-      window.dispatchEvent(new Event("storage"));
-      //scroll to latest text
-      var element = document.getElementById("chat-body");
-      function scrollToBottom(element) {
-        element.scroll({ top: element.scrollHeight, behavior: "smooth" });
-      }
-      scrollToBottom(element);
+      document.getElementById("msgForm").reset();
     }
   };
 
@@ -107,11 +120,16 @@ function ChatRoom({ messages }) {
                   {newMessageList.map((msg, idx) => {
                     if (msg.userId === getUserId?.userId) {
                       return (
-                        <ChatSend msg={msg.userMsg} username={msg?.userName} />
+                        <ChatSend
+                          key={idx}
+                          msg={msg.userMsg}
+                          username={msg?.userName}
+                        />
                       );
                     } else {
                       return (
                         <ChatReceive
+                          key={idx}
                           msg={msg.userMsg}
                           username={msg?.userName}
                         />

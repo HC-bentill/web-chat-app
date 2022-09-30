@@ -68,7 +68,7 @@ export function readAllMessages() {
   openRequest.onsuccess = (event) => {
     query(db, (data = []) => {
       // This gets called when the query has run with the loaded
-      console.log("all messages", data);
+      localStorage.setItem("results", JSON.stringify(data));
     });
   };
 }
@@ -80,7 +80,8 @@ export function addMessage(payload) {
     .add(payload);
 
   request.onsuccess = function (event) {
-    alert("message added");
+    console.log("message added");
+    window.dispatchEvent(new Event("storage"));
   };
 
   request.onerror = function (event) {
