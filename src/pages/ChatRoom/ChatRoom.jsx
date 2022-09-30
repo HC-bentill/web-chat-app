@@ -16,9 +16,9 @@ import ChatSend from "../../components/ChatSend";
 import { useDispatch } from "react-redux";
 import { setLogout } from "../../redux/user/userSlice";
 import { getItem } from "../../services/jwt.service";
-import { addMessage } from "../../services/chatRoomDB.service";
+import { addMessage } from "../../redux/app/appSlice";
 
-const testData = [
+const testDat = [
   //change ids to test for senders and receivers chat bubble
   {
     userId: "11049f5e-60d1-4b14-e5d5-619e9f7848d9",
@@ -38,24 +38,19 @@ const testData = [
 ];
 
 function ChatRoom({ messages }) {
+  const msgRef = useRef();
+
   setTimeout(function () {
     window.location.reload(1);
-    var element = document.getElementById("chat-body");
-    function scrollToBottom(element) {
-      element.scroll({ top: element.scrollHeight, behavior: "smooth" });
-    }
-    scrollToBottom(element);
   }, 5000);
 
   const dispatch = useDispatch();
-
+  var element = document.getElementById("chat-body");
   const [newMessageList, setNewMessageList] = useState([]);
   const getUserId = JSON.parse(getItem("User Data"));
   const handleLogout = () => {
     dispatch(setLogout());
   };
-
-  const msgRef = useRef();
 
   const resetMessages = () => {
     setNewMessageList([...messages]);
@@ -63,22 +58,27 @@ function ChatRoom({ messages }) {
 
   useEffect(() => {
     resetMessages();
+    console.log("new message added =", messages);
+    var element = document.getElementById("chat-body");
+    element.scrollTo(0, 9000);
   }, [messages]);
 
-  window.addEventListener("storage", () => {
-    resetMessages();
-  });
-
   const handleMsgSend = (event) => {
+    window.dispatchEvent(new Event("storage"));
     event.preventDefault();
-
+    function scrollToBottom(element) {
+      element.scroll({ top: element.scrollHeight, behavior: "smooth" });
+    }
+    scrollToBottom(element);
     const userMsg = {
       userId: getUserId?.userId,
       userMsg: msgRef?.current?.value,
       userName: getUserId?.username,
     };
-    addMessage(userMsg);
-    document.getElementById("msgForm").reset();
+    let action = dispatch(addMessage(userMsg));
+    if (action) {
+      document.getElementById("msgForm").reset();
+    }
   };
 
   const truncateText = (strn, len) => {
